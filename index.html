@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APU Smart Campus - AI Venue Booking & Management System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        apu: {
+                            blue: '#0056b3',
+                            red: '#e31b23',
+                            dark: '#1e293b'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .pulse-subtle {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Brand & Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-800 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                        A
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-bold text-lg text-slate-900 tracking-tight">APU Venue Booking Portal</span>
+                            <span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-blue-200 flex items-center gap-1">
+                                <i class="fa-solid fa-sparkles text-[10px]"></i> Gemini AI Evaluator
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500">Asia Pacific University Student Affairs & Campus Operations</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="hidden md:flex space-x-1" id="nav-tabs">
+                    <button onclick="switchTab('venues')" id="tab-btn-venues" class="px-4 py-2 text-sm font-semibold rounded-lg transition-colors bg-blue-50 text-blue-700 shadow-sm">
+                        <i class="fa-solid fa-building-columns mr-2"></i>Venue Availability
+                    </button>
+                    <button onclick="switchTab('gemini')" id="tab-btn-gemini" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
+                        <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Gemini AI Proposal Studio
+                    </button>
+                    <button onclick="switchTab('vip')" id="tab-btn-vip" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
+                        <i class="fa-solid fa-crown mr-2 text-amber-500"></i>VIP Preemption Engine
+                    </button>
+                    <button onclick="switchTab('inbox')" id="tab-btn-inbox" class="relative px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
+                        <i class="fa-solid fa-envelope mr-2"></i>Student Gmail Inbox
+                        <span id="unread-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">3</span>
+                    </button>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <div class="flex md:hidden">
+                    <button onclick="toggleMobileMenu()" class="p-2 rounded-md text-slate-500 hover:bg-slate-100">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Nav Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 bg-white px-4 pt-2 pb-4 space-y-1">
+            <button onclick="switchTab('venues')" class="w-full text-left px-3 py-2 rounded-md text-slate-700 hover:bg-slate-100 font-medium text-sm">Venue Availability</button>
+            <button onclick="switchTab('gemini')" class="w-full text-left px-3 py-2 rounded-md text-slate-700 hover:bg-slate-100 font-medium text-sm">Gemini AI Proposal Studio</button>
+            <button onclick="switchTab('vip')" class="w-full text-left px-3 py-2 rounded-md text-slate-700 hover:bg-slate-100 font-medium text-sm">VIP Preemption Engine</button>
+            <button onclick="switchTab('inbox')" class="w-full text-left px-3 py-2 rounded-md text-slate-700 hover:bg-slate-100 font-medium text-sm flex justify-between items-center">
+                <span>Student Gmail Inbox</span>
+                <span id="mobile-unread-badge" class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">3</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- System Status Bar -->
+    <div class="bg-slate-900 text-white text-xs py-2 px-4 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center space-x-2">
+                <span class="flex h-2 w-2 relative">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="font-medium text-slate-200">APU Gemini First-Come First-Served Auto-Approval Active</span>
+            </div>
+            <div class="flex items-center space-x-4 text-[11px] text-slate-400">
+                <span><i class="fa-solid fa-circle text-emerald-400 text-[8px] mr-1"></i> Green: Free</span>
+                <span><i class="fa-solid fa-circle text-amber-400 text-[8px] mr-1"></i> Yellow: Pending Review</span>
+                <span><i class="fa-solid fa-circle text-red-500 text-[8px] mr-1"></i> Red: Confirmed</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- TAB 1: VENUE AVAILABILITY DASHBOARD -->
+        <section id="tab-venues" class="space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-900">APU Campus Venues & Live Availability</h1>
+                    <p class="text-sm text-slate-500 mt-1">Select any available or pending room to submit your event proposal for instant Gemini AI evaluation.</p>
+                </div>
+                
+                <button onclick="switchTab('gemini')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-upload"></i> Submit Proposal Word Doc
+                </button>
+            </div>
+
+            <!-- Venues Grid -->
+            <div id="venues-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- TAB 2: GEMINI AI PROPOSAL EVALUATION STUDIO -->
+        <section id="tab-gemini" class="hidden space-y-6">
+            <div class="bg-gradient-to-r from-blue-900 to-indigo-900 rounded-2xl p-6 text-white shadow-md">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+                        <i class="fa-solid fa-sparkles text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold">Gemini AI Proposal Verification Engine</h1>
+                        <p class="text-xs text-blue-200 mt-0.5">Automated First-Come First-Served Evaluation Engine for APU Event Proposals</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left: Submission Form -->
+                <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-5">
+                    <h2 class="font-bold text-slate-900 border-b pb-3 flex items-center justify-between">
+                        <span><i class="fa-solid fa-file-word text-blue-600 mr-2"></i>Submit Booking Proposal Document</span>
+                        <span class="text-xs font-normal text-slate-500">First-Come First-Served</span>
+                    </h2>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Target Venue</label>
+                            <select id="proposal-venue-select" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Club / Organization Name</label>
+                            <input type="text" id="proposal-club-name" value="APU Developer Student Club" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Event Title</label>
+                        <input type="text" id="proposal-event-title" value="Annual Hackathon & AI Exhibition 2026" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+
+                    <!-- Proposal Requirement Simulation -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Word Doc Document Content Checklist</span>
+                            <span class="text-[11px] text-blue-600 font-medium"><i class="fa-solid fa-robot mr-1"></i>Gemini Visual & Text Scanner</span>
+                        </div>
+
+                        <!-- Requirement 1: Event Flow -->
+                        <label class="flex items-start gap-3 p-3 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-blue-300 transition-colors">
+                            <input type="checkbox" id="check-event-flow" checked class="mt-0.5 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+                            <div>
+                                <span class="text-sm font-semibold text-slate-900 block">Contains Clear Event Flow & Timeline</span>
+                                <span class="text-xs text-slate-500">Detailed timetable (e.g. 09:00 Registration, 10:00 Keynote, 16:00 Closing).</span>
+                            </div>
+                        </label>
+
+                        <!-- Requirement 2: Floorplan Picture -->
+                        <label class="flex items-start gap-3 p-3 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-blue-300 transition-colors">
+                            <input type="checkbox" id="check-floorplan" checked class="mt-0.5 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+                            <div>
+                                <span class="text-sm font-semibold text-slate-900 block">Floorplan Diagram Image Attached</span>
+                                <span class="text-xs text-slate-500">Visual layout image embedded showing stage, equipment, and seating structure.</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Document Text Preview</label>
+                        <textarea id="proposal-text-summary" rows="3" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl p-3 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">09:00 AM - Registration & Participant Briefing
+10:30 AM - Hackathon Keynote & AI Challenge Release
+03:00 PM - Project Demos & Judging Panel Evaluation
+05:30 PM - Prize Giving Ceremony & Room Cleaning</textarea>
+                    </div>
+
+                    <button onclick="runGeminiEvaluation()" id="btn-run-ai" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-brain"></i>
+                        <span>Run Gemini AI Automated Evaluation</span>
+                    </button>
+                </div>
+
+                <!-- Right: AI Evaluation Live Visualizer Console -->
+                <div class="lg:col-span-5 flex flex-col space-y-4">
+                    <div class="bg-slate-900 rounded-2xl p-5 text-slate-100 shadow-sm flex-grow flex flex-col justify-between min-h-[420px]">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                                    <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+                                    <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                                    <span class="text-xs font-mono text-slate-400 ml-2">gemini-eval-terminal.v3</span>
+                                </div>
+                                <span id="eval-status-badge" class="text-[10px] bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-full font-mono">READY</span>
+                            </div>
+
+                            <div id="ai-console-output" class="font-mono text-xs space-y-2.5 text-slate-300 max-h-[300px] overflow-y-auto pr-2">
+                                <p class="text-slate-500">&gt; System initialized. Ready to process proposal document...</p>
+                                <p class="text-slate-500">&gt; First-Come First-Served Rules Enforcement: Active.</p>
+                                <p class="text-slate-500">&gt; Select target venue and document parameters to test approval logic.</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-slate-800">
+                            <div class="text-[11px] uppercase font-bold text-slate-400 mb-2">Required AI Checklist Criteria</div>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <div id="console-chk-1" class="flex items-center space-x-1.5 text-slate-500 bg-slate-800/60 p-2 rounded-lg">
+                                    <i class="fa-solid fa-circle-minus"></i>
+                                    <span>Event Flow</span>
+                                </div>
+                                <div id="console-chk-2" class="flex items-center space-x-1.5 text-slate-500 bg-slate-800/60 p-2 rounded-lg">
+                                    <i class="fa-solid fa-circle-minus"></i>
+                                    <span>Floorplan Image</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: EXTERNAL VIP OVERRIDE ENGINE -->
+        <section id="tab-vip" class="hidden space-y-6">
+            <div class="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 rounded-2xl p-6 text-white shadow-md">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center border border-white/30">
+                        <i class="fa-solid fa-crown text-xl text-amber-200"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold">External VIP Preemption & Compensation Control</h1>
+                        <p class="text-xs text-amber-100 mt-0.5">High-priority external authority bookings supersede student bookings upon verified payment.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- VIP Booking Form -->
+                <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-5">
+                    <div class="flex items-center justify-between border-b pb-3">
+                        <h2 class="font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-shield-exclamation text-amber-500"></i> Simulate External VIP Booking Request
+                        </h2>
+                        <span class="bg-amber-100 text-amber-800 text-xs px-2.5 py-0.5 rounded-full font-semibold">Priority Preemption</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Target APU Venue</label>
+                            <select id="vip-venue-select" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                                <!-- Dynamic options -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">VIP Authority Entity</label>
+                            <input type="text" id="vip-entity-name" value="Ministry of Higher Education (MOHE) Delegation" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">VIP Event Title</label>
+                        <input type="text" id="vip-event-title" value="National AI & Digital Education Summit 2026" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    </div>
+
+                    <!-- Payment Check Toggle -->
+                    <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-4">
+                        <label class="flex items-start gap-3 cursor-pointer">
+                            <input type="checkbox" id="vip-payment-status" checked class="mt-1 w-5 h-5 text-amber-600 rounded border-amber-300 focus:ring-amber-500">
+                            <div>
+                                <span class="text-sm font-bold text-slate-900 block">APU Financial System: External Payment Settled</span>
+                                <span class="text-xs text-slate-600 leading-relaxed block mt-0.5">
+                                    When checked, system verifies that VIP rental payment is paid into APU bank account. If verified, existing student bookings (RED or YELLOW) will be preempted and granted free digital cafeteria food vouchers.
+                                </span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <button onclick="executeVipOverride()" class="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Process VIP Request & Trigger Compensation Logic</span>
+                    </button>
+                </div>
+
+                <!-- Info Side Panel -->
+                <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <h3 class="font-bold text-slate-900 border-b pb-3 text-sm uppercase tracking-wider text-slate-500">
+                            <i class="fa-solid fa-gift text-amber-500 mr-2"></i>APU VIP Compensation Standard Operating Procedure
+                        </h3>
+
+                        <div class="space-y-3 text-xs text-slate-600">
+                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                <span class="font-bold text-slate-900 block mb-1">1. VIP Payment Priority:</span>
+                                <span>External VIP bookings paying official facility rental fees supersede student club bookings.</span>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                <span class="font-bold text-slate-900 block mb-1">2. Cancellation Notice:</span>
+                                <span>Automated apology email sent via Student Affairs (Ahmad Mohammad).</span>
+                            </div>
+                            <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900">
+                                <span class="font-bold block mb-1"><i class="fa-solid fa-utensils mr-1"></i>3. Free Cafeteria Vouchers:</span>
+                                <span>3x RM15 Digital Cafeteria Food Vouchers (Total RM45 value) with scannable QR codes attached automatically inside the notification email.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-slate-900 rounded-xl text-white text-xs space-y-1">
+                        <div class="text-slate-400 text-[10px] uppercase font-bold">System Status Log</div>
+                        <div id="vip-log-text" class="font-mono text-emerald-400">Idle - Standing by for VIP execution.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: GMAIL INBOX & NOTIFICATION PREVIEW (Matching Image 2 Format) -->
+        <section id="tab-inbox" class="hidden space-y-4">
+            
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+                
+                <!-- Gmail Left Sidebar -->
+                <div class="w-full md:w-64 bg-slate-50 border-r border-slate-200 p-4 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3 bg-blue-100 hover:bg-blue-200 text-blue-900 px-5 py-3 rounded-2xl shadow-sm cursor-pointer font-semibold text-sm transition-all w-fit sm:w-full">
+                            <i class="fa-solid fa-pen text-base text-blue-600"></i>
+                            <span>Compose</span>
+                        </div>
+
+                        <div class="space-y-1 text-sm font-medium">
+                            <button class="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-blue-100 text-blue-800 font-bold">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fa-solid fa-inbox w-4 text-center"></i>
+                                    <span>Inbox</span>
+                                </div>
+                                <span id="inbox-count-tag" class="text-xs bg-blue-200 text-blue-900 px-2 py-0.5 rounded-full">3</span>
+                            </button>
+                            <button class="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-200">
+                                <i class="fa-solid fa-star w-4 text-center"></i>
+                                <span>Starred</span>
+                            </button>
+                            <button class="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-200">
+                                <i class="fa-solid fa-paper-plane w-4 text-center"></i>
+                                <span>Sent</span>
+                            </button>
+                            <button class="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-200">
+                                <i class="fa-solid fa-file w-4 text-center"></i>
+                                <span>Drafts</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="text-xs text-slate-400 pt-4 border-t border-slate-200">
+                        <i class="fa-solid fa-envelope-open-text mr-1"></i> APU Webmail Sync Active
+                    </div>
+                </div>
+
+                <!-- Gmail Main Content View -->
+                <div class="flex-grow flex flex-col bg-white">
+                    
+                    <div class="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
+                        <div class="flex items-center space-x-2 bg-slate-200/70 rounded-full px-4 py-2 w-full max-w-xl text-xs text-slate-600">
+                            <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+                            <input type="text" placeholder="Search venue booking notifications..." class="bg-transparent border-none focus:outline-none w-full">
+                        </div>
+                        <div class="hidden sm:flex items-center space-x-3 text-slate-500 text-sm">
+                            <i class="fa-solid fa-gear hover:text-slate-800 cursor-pointer"></i>
+                            <i class="fa-solid fa-circle-user hover:text-slate-800 cursor-pointer text-lg"></i>
+                        </div>
+                    </div>
+
+                    <div class="flex-grow grid grid-cols-1 lg:grid-cols-12">
+                        <!-- List of Emails -->
+                        <div class="lg:col-span-5 border-r border-slate-200 divide-y divide-slate-100 overflow-y-auto max-h-[550px]" id="email-list-container">
+                            <!-- Dynamically loaded emails -->
+                        </div>
+
+                        <!-- Email Reader Body View (Image 2 Styled) -->
+                        <div class="lg:col-span-7 p-6 overflow-y-auto max-h-[550px] bg-white" id="email-reader-body">
+                            <!-- Rendered when email selected -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Global Toast Banner Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const state = {
+            activeTab: 'venues',
+            venues: [
+                {
+                    id: 'auditorium1',
+                    name: 'Auditorium 1',
+                    capacity: 350,
+                    location: 'Block A, Level 3',
+                    status: 'GREEN',
+                    bookedBy: null,
+                    eventName: null
+                },
+                {
+                    id: 'atriumb',
+                    name: 'Atrium Block B',
+                    capacity: 600,
+                    location: 'Block B, Ground Floor',
+                    status: 'YELLOW',
+                    bookedBy: 'APU Robotics Club',
+                    eventName: 'RoboWars Tech Exhibition'
+                },
+                {
+                    id: 'mph',
+                    name: 'Multi-Purpose Hall',
+                    capacity: 800,
+                    location: 'Sports Complex Level 2',
+                    status: 'RED',
+                    bookedBy: 'APU Cultural Society',
+                    eventName: 'Global Harmony Night 2026'
+                },
+                {
+                    id: 'seminar302',
+                    name: 'Seminar Room 302',
+                    capacity: 80,
+                    location: 'Block C, Level 3',
+                    status: 'GREEN',
+                    bookedBy: null,
+                    eventName: null
+                },
+                {
+                    id: 'innovlab',
+                    name: 'Innovation Lab',
+                    capacity: 120,
+                    location: 'Block D, Level 1',
+                    status: 'YELLOW',
+                    bookedBy: 'APU CyberSecurity Club',
+                    eventName: 'Capture The Flag Hackathon'
+                }
+            ],
+            emails: [
+                {
+                    id: 'em-1',
+                    unread: true,
+                    date: 'Thu 5 Nov, 09:35',
+                    senderName: 'Ahmad Mohammad',
+                    senderEmail: 'ahmad.mohammad@apu.edu.my',
+                    recipient: 'to apuclscco@gmail.com, yonghan514@gmail.com, studentclubs@apu.edu.my',
+                    subject: 'Weekly Venue Booking Updates (9th - 15th November 2026)',
+                    type: 'weekly_update',
+                    content: {
+                        greeting: 'Dear PIC,',
+                        opening: 'Greetings from Student Affairs.',
+                        body: 'The status of room and auditorium booking requests has been updated in the status sheet. Please refer to the sheet to check the current status of your bookings (e.g., Confirmed, Cancelled, Venue Changed and Needs Update from PIC).',
+                        linkText: 'Room & Auditorium Booking Confirmation Status Sheet Link',
+                        guidelines: [
+                            'Booking requests for Sundays are not permitted as per current policy.',
+                            'Booth setup requests in the Atrium must be submitted using a separate template titled "Audio, Visual and Atrium Requests."',
+                            'Atrium requests must be submitted using the correct form — Logistics, Audio & Visual, T&I, or Atrium Request — available on the Student Affairs website.'
+                        ],
+                        closing: 'We appreciate your attention to these guidelines to ensure smooth processing moving forward. If you require further clarification, feel free to reach out to me.',
+                        signoff: 'Thank you and regards,\n\nSA'
+                    }
+                },
+                {
+                    id: 'em-2',
+                    unread: true,
+                    date: 'Mon 9 Nov, 10:15',
+                    senderName: 'Gemini AI Booking Engine',
+                    senderEmail: 'ahmad.mohammad@apu.edu.my',
+                    recipient: 'to apucultural@apu.edu.my',
+                    subject: 'CONFIRMED: Venue Booking Request for Multi-Purpose Hall',
+                    type: 'confirmation',
+                    details: {
+                        venue: 'Multi-Purpose Hall',
+                        club: 'APU Cultural Society',
+                        event: 'Global Harmony Night 2026',
+                        reason: 'Proposal document verified successfully. Event Flow and Floorplan picture attachments passed Gemini AI evaluation.'
+                    }
+                },
+                {
+                    id: 'em-3',
+                    unread: true,
+                    date: 'Mon 9 Nov, 08:30',
+                    senderName: 'Student Affairs APU',
+                    senderEmail: 'ahmad.mohammad@apu.edu.my',
+                    recipient: 'to apugaming@apu.edu.my',
+                    subject: 'NOTICE: Venue Booking Update for Atrium Block B',
+                    type: 'apology_yellow',
+                    details: {
+                        venue: 'Atrium Block B',
+                        bookedClub: 'APU Robotics Club',
+                        bookedEvent: 'RoboWars Tech Exhibition',
+                        requestedClub: 'APU Gaming Society'
+                    }
+                }
+            ],
+            selectedEmailId: 'em-1'
+        };
+
+        window.onload = function() {
+            renderVenues();
+            populateVenueSelects();
+            renderInbox();
+            updateUnreadBadges();
+        };
+
+        function switchTab(tabId) {
+            state.activeTab = tabId;
+            const tabs = ['venues', 'gemini', 'vip', 'inbox'];
+            
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tabId) {
+                    el.classList.remove('hidden');
+                    if (btn) {
+                        btn.className = "px-4 py-2 text-sm font-semibold rounded-lg transition-colors bg-blue-50 text-blue-700 shadow-sm";
+                    }
+                } else {
+                    el.classList.add('hidden');
+                    if (btn) {
+                        btn.className = "px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors";
+                    }
+                }
+            });
+
+            document.getElementById('mobile-menu').classList.add('hidden');
+
+            if (tabId === 'venues') renderVenues();
+            if (tabId === 'inbox') renderInbox();
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function renderVenues() {
+            const container = document.getElementById('venues-grid-container');
+            if (!container) return;
+
+            let html = '';
+            state.venues.forEach(venue => {
+                let statusBadge = '';
+                let borderClass = 'border-slate-200';
+                let headerBg = 'bg-slate-50';
+
+                if (venue.status === 'GREEN') {
+                    statusBadge = `<span class="bg-emerald-500 text-white text-xs px-2.5 py-1 rounded-full font-bold flex items-center gap-1"><i class="fa-solid fa-circle-check text-[10px]"></i> FREE / AVAILABLE</span>`;
+                    borderClass = 'border-emerald-200 hover:border-emerald-400';
+                } else if (venue.status === 'YELLOW') {
+                    statusBadge = `<span class="bg-amber-400 text-slate-900 text-xs px-2.5 py-1 rounded-full font-bold flex items-center gap-1 pulse-subtle"><i class="fa-solid fa-clock text-[10px]"></i> PROVISIONALLY HELD</span>`;
+                    borderClass = 'border-amber-300 hover:border-amber-400';
+                    headerBg = 'bg-amber-50/50';
+                } else {
+                    statusBadge = `<span class="bg-red-500 text-white text-xs px-2.5 py-1 rounded-full font-bold flex items-center gap-1"><i class="fa-solid fa-lock text-[10px]"></i> CONFIRMED & BOOKED</span>`;
+                    borderClass = 'border-red-200';
+                    headerBg = 'bg-red-50/30';
+                }
+
+                html += `
+                    <div class="bg-white rounded-2xl border ${borderClass} shadow-sm overflow-hidden flex flex-col justify-between transition-all duration-200">
+                        <div>
+                            <div class="${headerBg} p-4 border-b border-slate-100 flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-bold text-slate-900 text-base">${venue.name}</h3>
+                                    <p class="text-xs text-slate-500"><i class="fa-solid fa-location-dot mr-1"></i>${venue.location}</p>
+                                </div>
+                                ${statusBadge}
+                            </div>
+
+                            <div class="p-4 space-y-3 text-xs">
+                                <div class="flex justify-between py-1 border-b border-slate-100 text-slate-600">
+                                    <span>Seating Capacity:</span>
+                                    <span class="font-bold text-slate-800">${venue.capacity} Pax</span>
+                                </div>
+
+                                ${venue.status !== 'GREEN' ? `
+                                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 space-y-1">
+                                        <div class="text-[10px] font-bold text-slate-400 uppercase">Current Holder</div>
+                                        <div class="font-bold text-slate-800 text-xs">${venue.eventName || 'N/A'}</div>
+                                        <div class="text-slate-600">Club: ${venue.bookedBy || 'N/A'}</div>
+                                    </div>
+                                ` : `
+                                    <div class="bg-emerald-50/60 p-3 rounded-xl border border-emerald-100 text-emerald-800">
+                                        <i class="fa-solid fa-sparkles text-emerald-600 mr-1"></i>
+                                        Room is open. Submitting proposal with Event Flow + Floorplan will instantly approve this venue.
+                                    </div>
+                                `}
+
+                                ${venue.status === 'YELLOW' ? `
+                                    <div class="text-[11px] text-amber-800 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+                                        <i class="fa-solid fa-triangle-exclamation mr-1 text-amber-600"></i>
+                                        <strong>Yellow Conflict Mode:</strong> Another club can submit a qualifying proposal to trigger AI first-come evaluation & lock this venue.
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 border-t border-slate-100">
+                            ${venue.status === 'RED' ? `
+                                <button disabled class="w-full bg-slate-200 text-slate-500 font-semibold py-2.5 rounded-xl text-xs cursor-not-allowed">
+                                    Venue Locked / Booked
+                                </button>
+                            ` : `
+                                <button onclick="selectVenueForProposal('${venue.id}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+                                    <i class="fa-solid fa-file-pen"></i> Apply / Submit Proposal for ${venue.name}
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function populateVenueSelects() {
+            const proposalSelect = document.getElementById('proposal-venue-select');
+            const vipSelect = document.getElementById('vip-venue-select');
+
+            if (!proposalSelect || !vipSelect) return;
+
+            let proposalOptions = '';
+            let vipOptions = '';
+
+            state.venues.forEach(v => {
+                proposalOptions += `<option value="${v.id}">${v.name} (${v.status})</option>`;
+                vipOptions += `<option value="${v.id}">${v.name} - Current: ${v.status} ${v.bookedBy ? '('+v.bookedBy+')' : ''}</option>`;
+            });
+
+            proposalSelect.innerHTML = proposalOptions;
+            vipSelect.innerHTML = vipOptions;
+        }
+
+        function selectVenueForProposal(venueId) {
+            switchTab('gemini');
+            const select = document.getElementById('proposal-venue-select');
+            if (select) select.value = venueId;
+        }
+
+        function runGeminiEvaluation() {
+            const venueId = document.getElementById('proposal-venue-select').value;
+            const clubName = document.getElementById('proposal-club-name').value.trim() || 'Anonymous Club';
+            const eventTitle = document.getElementById('proposal-event-title').value.trim() || 'APU Event';
+            const hasEventFlow = document.getElementById('check-event-flow').checked;
+            const hasFloorplan = document.getElementById('check-floorplan').checked;
+
+            const venue = state.venues.find(v => v.id === venueId);
+            if (!venue) return;
+
+            const consoleElem = document.getElementById('ai-console-output');
+            const badgeElem = document.getElementById('eval-status-badge');
+            const btnElem = document.getElementById('btn-run-ai');
+
+            btnElem.disabled = true;
+            badgeElem.className = "text-[10px] bg-amber-500 text-slate-900 px-2.5 py-0.5 rounded-full font-mono font-bold animate-pulse";
+            badgeElem.innerText = "EVALUATING";
+
+            consoleElem.innerHTML = `
+                <p class="text-blue-400">&gt; [Gemini AI Engine] Target Venue: ${venue.name} (Current Status: ${venue.status})</p>
+                <p class="text-slate-300">&gt; Applicant: ${clubName} - "${eventTitle}"</p>
+                <p class="text-amber-400">&gt; Scanning Word document for required Event Flow & Floorplan diagram...</p>
+            `;
+
+            setTimeout(() => {
+                const chk1 = document.getElementById('console-chk-1');
+                const chk2 = document.getElementById('console-chk-2');
+
+                if (hasEventFlow) {
+                    chk1.className = "flex items-center space-x-1.5 text-emerald-400 bg-emerald-950/60 p-2 rounded-lg border border-emerald-800";
+                    chk1.innerHTML = `<i class="fa-solid fa-circle-check"></i><span>Event Flow Valid</span>`;
+                } else {
+                    chk1.className = "flex items-center space-x-1.5 text-red-400 bg-red-950/60 p-2 rounded-lg border border-red-800";
+                    chk1.innerHTML = `<i class="fa-solid fa-circle-xmark"></i><span>Event Flow Missing</span>`;
+                }
+
+                if (hasFloorplan) {
+                    chk2.className = "flex items-center space-x-1.5 text-emerald-400 bg-emerald-950/60 p-2 rounded-lg border border-emerald-800";
+                    chk2.innerHTML = `<i class="fa-solid fa-circle-check"></i><span>Floorplan Valid</span>`;
+                } else {
+                    chk2.className = "flex items-center space-x-1.5 text-red-400 bg-red-950/60 p-2 rounded-lg border border-red-800";
+                    chk2.innerHTML = `<i class="fa-solid fa-circle-xmark"></i><span>Floorplan Missing</span>`;
+                }
+
+                if (hasEventFlow && hasFloorplan) {
+                    badgeElem.className = "text-[10px] bg-emerald-500 text-white px-2.5 py-0.5 rounded-full font-mono font-bold";
+                    badgeElem.innerText = "APPROVED";
+
+                    const previousHolder = venue.bookedBy;
+                    const previousEvent = venue.eventName;
+                    const werePreviousConflicts = (venue.status === 'YELLOW' && previousHolder && previousHolder !== clubName);
+
+                    venue.status = 'RED';
+                    venue.bookedBy = clubName;
+                    venue.eventName = eventTitle;
+
+                    consoleElem.innerHTML += `
+                        <p class="text-emerald-400 font-bold">&gt; [RESULT] Proposal PASSES all APU Student Affairs Criteria.</p>
+                        <p class="text-emerald-300">&gt; Status updated: ${venue.name} is now RED (Confirmed).</p>
+                    `;
+
+                    const confirmEmail = {
+                        id: `em-${Date.now()}-1`,
+                        unread: true,
+                        date: getFormattedDate(),
+                        senderName: 'Gemini AI Booking Engine',
+                        senderEmail: 'ahmad.mohammad@apu.edu.my',
+                        recipient: `to ${clubName.toLowerCase().replace(/\s+/g,'')}@apu.edu.my`,
+                        subject: `CONFIRMED: Venue Booking Request for ${venue.name}`,
+                        type: 'confirmation',
+                        details: {
+                            venue: venue.name,
+                            club: clubName,
+                            event: eventTitle,
+                            reason: 'Proposal document verified successfully. Event Flow and Floorplan picture attachments passed Gemini AI evaluation.'
+                        }
+                    };
+                    state.emails.unshift(confirmEmail);
+
+                    if (werePreviousConflicts) {
+                        consoleElem.innerHTML += `
+                            <p class="text-amber-400">&gt; [CONFLICT DETECTED] Preceding provisional booking by "${previousHolder}" displaced on First-Come First-Served rule.</p>
+                            <p class="text-amber-300">&gt; Automated Apology Notification dispatched to ${previousHolder}.</p>
+                        `;
+
+                        const apologyEmail = {
+                            id: `em-${Date.now()}-2`,
+                            unread: true,
+                            date: getFormattedDate(),
+                            senderName: 'Student Affairs APU',
+                            senderEmail: 'ahmad.mohammad@apu.edu.my',
+                            recipient: `to ${previousHolder.toLowerCase().replace(/\s+/g,'')}@apu.edu.my`,
+                            subject: `NOTICE: Venue Booking Update for ${venue.name}`,
+                            type: 'apology_yellow',
+                            details: {
+                                venue: venue.name,
+                                bookedClub: clubName,
+                                bookedEvent: eventTitle,
+                                requestedClub: previousHolder
+                            }
+                        };
+                        state.emails.unshift(apologyEmail);
+                    }
+
+                    showToast(`Proposal Approved! ${venue.name} is now booked by ${clubName}.`, 'success');
+
+                } else {
+                    badgeElem.className = "text-[10px] bg-red-500 text-white px-2.5 py-0.5 rounded-full font-mono font-bold";
+                    badgeElem.innerText = "REJECTED";
+
+                    if (venue.status === 'GREEN') {
+                        venue.status = 'YELLOW';
+                        venue.bookedBy = clubName;
+                        venue.eventName = eventTitle;
+                    }
+
+                    consoleElem.innerHTML += `
+                        <p class="text-red-400 font-bold">&gt; [RESULT] Proposal REJECTED by Gemini AI.</p>
+                        <p class="text-red-300">&gt; Missing elements: ${!hasEventFlow ? '[Clear Event Flow] ' : ''}${!hasFloorplan ? '[Floorplan Picture] ' : ''}</p>
+                        <p class="text-amber-300">&gt; Venue status flagged as YELLOW (Pending complete resubmission).</p>
+                    `;
+
+                    showToast('Proposal Incomplete: Required Event Flow & Floorplan diagram.', 'error');
+                }
+
+                btnElem.disabled = false;
+                renderVenues();
+                populateVenueSelects();
+                updateUnreadBadges();
+            }, 1200);
+        }
+
+        function executeVipOverride() {
+            const venueId = document.getElementById('vip-venue-select').value;
+            const vipEntity = document.getElementById('vip-entity-name').value.trim() || 'External VIP Authority';
+            const vipEvent = document.getElementById('vip-event-title').value.trim() || 'Official High-Level Summit';
+            const paymentConfirmed = document.getElementById('vip-payment-status').checked;
+
+            const venue = state.venues.find(v => v.id === venueId);
+            if (!venue) return;
+
+            const logElem = document.getElementById('vip-log-text');
+
+            if (!paymentConfirmed) {
+                logElem.className = "font-mono text-red-400";
+                logElem.innerText = `[REJECTED] VIP payment NOT verified in APU financial system. Booking override aborted.`;
+                showToast('VIP Override failed: Payment must be confirmed.', 'error');
+                return;
+            }
+
+            const displacedClub = venue.bookedBy || 'Provisionally Interested Club';
+            const displacedEvent = venue.eventName || 'Scheduled Student Event';
+
+            venue.status = 'RED';
+            venue.bookedBy = `[VIP] ${vipEntity}`;
+            venue.eventName = vipEvent;
+
+            const vipApologyEmail = {
+                id: `em-vip-${Date.now()}`,
+                unread: true,
+                date: getFormattedDate(),
+                senderName: 'Ahmad Mohammad (Student Affairs)',
+                senderEmail: 'ahmad.mohammad@apu.edu.my',
+                recipient: `to ${displacedClub.toLowerCase().replace(/\s+/g,'')}@apu.edu.my`,
+                subject: `URGENT: APU Venue Preemption Notice - ${venue.name}`,
+                type: 'vip_compensation',
+                details: {
+                    venue: venue.name,
+                    displacedClub: displacedClub,
+                    displacedEvent: displacedEvent,
+                    vipEntity: vipEntity,
+                    vipEvent: vipEvent,
+                    vouchers: [
+                        { code: 'APU-MEAL-8831', value: 'RM 15.00', expiry: '31 Dec 2026' },
+                        { code: 'APU-MEAL-8832', value: 'RM 15.00', expiry: '31 Dec 2026' },
+                        { code: 'APU-MEAL-8833', value: 'RM 15.00', expiry: '31 Dec 2026' }
+                    ]
+                }
+            };
+
+            state.emails.unshift(vipApologyEmail);
+
+            logElem.className = "font-mono text-emerald-400";
+            logElem.innerText = `[SUCCESS] ${vipEntity} booked ${venue.name}. Payment verified. Preempted "${displacedClub}". 3x RM15 Cafeteria Vouchers issued.`;
+
+            showToast(`VIP Booking Confirmed. Apology & Cafeteria Vouchers sent to ${displacedClub}.`, 'success');
+
+            renderVenues();
+            populateVenueSelects();
+            updateUnreadBadges();
+            
+            setTimeout(() => {
+                switchTab('inbox');
+                selectEmail(vipApologyEmail.id);
+            }, 1200);
+        }
+
+        function renderInbox() {
+            const listContainer = document.getElementById('email-list-container');
+            if (!listContainer) return;
+
+            let listHtml = '';
+
+            state.emails.forEach(email => {
+                const isSelected = email.id === state.selectedEmailId;
+                const activeBg = isSelected ? 'bg-blue-50/80 border-l-4 border-l-blue-600' : 'hover:bg-slate-50';
+                const fontBold = email.unread ? 'font-bold text-slate-900' : 'font-medium text-slate-700';
+
+                listHtml += `
+                    <div onclick="selectEmail('${email.id}')" class="p-3.5 cursor-pointer transition-colors ${activeBg}">
+                        <div class="flex items-center justify-between text-xs mb-1">
+                            <span class="${fontBold} truncate max-w-[180px]">${email.senderName}</span>
+                            <span class="text-[11px] text-slate-400">${email.date.split(',')[1] || email.date}</span>
+                        </div>
+                        <div class="text-xs ${fontBold} truncate mb-1">${email.subject}</div>
+                        <div class="text-[11px] text-slate-500 truncate">
+                            ${email.type === 'weekly_update' ? 'The status of room and auditorium booking requests has been updated...' : ''}
+                            ${email.type === 'confirmation' ? `Venue ${email.details.venue} approved by Gemini AI engine...` : ''}
+                            ${email.type === 'apology_yellow' ? `The venue has been booked by ${email.details.bookedClub}...` : ''}
+                            ${email.type === 'vip_compensation' ? `VIP Preemption notification + 3x Free Cafeteria Vouchers enclosed...` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            listContainer.innerHTML = listHtml;
+            renderSelectedEmailBody();
+        }
+
+        function selectEmail(emailId) {
+            state.selectedEmailId = emailId;
+            const email = state.emails.find(e => e.id === emailId);
+            if (email) email.unread = false;
+            updateUnreadBadges();
+            renderInbox();
+        }
+
+        function renderSelectedEmailBody() {
+            const bodyContainer = document.getElementById('email-reader-body');
+            if (!bodyContainer) return;
+
+            const email = state.emails.find(e => e.id === state.selectedEmailId);
+            if (!email) {
+                bodyContainer.innerHTML = '<div class="text-center text-slate-400 py-12">Select an email to view preview</div>';
+                return;
+            }
+
+            let html = '';
+
+            if (email.type === 'weekly_update') {
+                const c = email.content;
+                html = `
+                    <div class="space-y-6">
+                        <div class="flex items-start justify-between border-b border-slate-200 pb-4">
+                            <h2 class="text-xl font-bold text-slate-900 leading-snug">${email.subject}</h2>
+                            <span class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded font-mono">Inbox</span>
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs text-slate-500">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-700 text-sm">
+                                    AM
+                                </div>
+                                <div>
+                                    <div class="font-bold text-slate-900 text-sm">${email.senderName} <span class="font-normal text-slate-500">&lt;${email.senderEmail}&gt;</span></div>
+                                    <div class="text-slate-500 text-[11px]">${email.recipient}</div>
+                                </div>
+                            </div>
+                            <span>${email.date}</span>
+                        </div>
+
+                        <div class="text-xs text-slate-800 space-y-4 leading-relaxed font-sans">
+                            <p>${c.greeting}</p>
+                            <p>${c.opening}</p>
+                            <p>${c.body}</p>
+                            
+                            <p class="py-1">
+                                <a href="#" class="text-blue-600 underline font-medium hover:text-blue-800">
+                                    ${c.linkText}
+                                </a>
+                            </p>
+
+                            <p>If your booking is missing from the status sheet, kindly reply to this email for assistance.</p>
+
+                            <div>
+                                <p class="font-bold text-slate-900 mb-2">Important Guidelines:</p>
+                                <ul class="list-disc list-inside space-y-2 text-slate-700 pl-1">
+                                    ${c.guidelines.map(g => `<li>${g}</li>`).join('')}
+                                </ul>
+                            </div>
+
+                            <p>${c.closing}</p>
+                            <p>Thank you and regards,</p>
+                            <p class="font-bold text-slate-900">${c.signoff.split('\n')[2] || 'SA'}</p>
+                        </div>
+                    </div>
+                `;
+            } else if (email.type === 'confirmation') {
+                const d = email.details;
+                html = `
+                    <div class="space-y-6">
+                        <div class="border-b border-slate-200 pb-4">
+                            <h2 class="text-xl font-bold text-slate-900">${email.subject}</h2>
+                        </div>
+                        <div class="flex items-center space-x-3 text-xs">
+                            <div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+                                AI
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-900">${email.senderName}</div>
+                                <div class="text-slate-500">${email.recipient}</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 space-y-3 text-xs">
+                            <div class="flex items-center gap-2 text-emerald-800 font-bold text-sm">
+                                <i class="fa-solid fa-circle-check text-emerald-600"></i> Venue Request Status: APPROVED & CONFIRMED
+                            </div>
+                            <p class="text-slate-700">Dear <strong>${d.club}</strong>,</p>
+                            <p class="text-slate-700">We are pleased to inform you that your booking proposal for <strong>${d.venue}</strong> ("${d.event}") has been successfully verified by APU Gemini AI Engine.</p>
+                            
+                            <div class="bg-white p-3 rounded-xl border border-emerald-200 space-y-1">
+                                <span class="font-bold text-slate-800 block">AI Verification Summary:</span>
+                                <span class="text-slate-600 block">${d.reason}</span>
+                            </div>
+
+                            <p class="text-slate-600">Please present this email to APU Facilities Management on the date of event setup.</p>
+                        </div>
+                    </div>
+                `;
+            } else if (email.type === 'apology_yellow') {
+                const d = email.details;
+                html = `
+                    <div class="space-y-6">
+                        <div class="border-b border-slate-200 pb-4">
+                            <h2 class="text-xl font-bold text-slate-900">${email.subject}</h2>
+                        </div>
+                        <div class="flex items-center space-x-3 text-xs">
+                            <div class="w-9 h-9 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
+                                SA
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-900">${email.senderName}</div>
+                                <div class="text-slate-500">${email.recipient}</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 space-y-3 text-xs">
+                            <div class="font-bold text-amber-900 text-sm">Apology Notice: Venue Already Booked</div>
+                            <p class="text-slate-700">Dear <strong>${d.requestedClub}</strong>,</p>
+                            <p class="text-slate-700">
+                                We regret to inform you that your provisional booking request for <strong>${d.venue}</strong> could not be fulfilled.
+                            </p>
+                            <div class="p-3 bg-white rounded-xl border border-amber-200 font-semibold text-amber-900">
+                                <i class="fa-solid fa-info-circle mr-1"></i> The venue has been booked by <strong>${d.bookedClub}</strong> for <strong>"${d.bookedEvent}"</strong> on a first-come first-served verified proposal basis.
+                            </div>
+                            <p class="text-slate-600">You may log into the APU Venue Portal to select an alternative available room (GREEN status).</p>
+                        </div>
+                    </div>
+                `;
+            } else if (email.type === 'vip_compensation') {
+                const d = email.details;
+                html = `
+                    <div class="space-y-6">
+                        <div class="border-b border-slate-200 pb-4">
+                            <h2 class="text-xl font-bold text-red-600">${email.subject}</h2>
+                        </div>
+                        <div class="flex items-center space-x-3 text-xs">
+                            <div class="w-9 h-9 rounded-full bg-red-100 text-red-800 flex items-center justify-center font-bold">
+                                SA
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-900">${email.senderName}</div>
+                                <div class="text-slate-500">${email.recipient}</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4 text-xs">
+                            <p class="text-slate-800">Dear <strong>${d.displacedClub}</strong>,</p>
+                            <p class="text-slate-700 leading-relaxed">
+                                We sincerely apologize for this urgent update. Due to an official external VIP authority booking request by <strong>"${d.vipEntity}"</strong> (Event: <em>${d.vipEvent}</em>) with payment confirmed to APU, your booking for <strong>${d.venue}</strong> ("${d.displacedEvent}") has been preempted as per university policy.
+                            </p>
+
+                            <div class="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl p-4 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-extrabold text-amber-900 text-sm flex items-center gap-1.5">
+                                        <i class="fa-solid fa-utensils text-amber-600"></i> APU Cafeteria Digital Compensation Vouchers
+                                    </span>
+                                    <span class="bg-amber-200 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-full">3 VOUCHERS ATTACHED</span>
+                                </div>
+                                <p class="text-slate-600 text-[11px]">As compensation, APU Student Affairs has automatically credited your student club with free digital food vouchers for APU Cafeteria:</p>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                                    ${d.vouchers.map(v => `
+                                        <div class="bg-white p-3 rounded-xl border border-amber-200 shadow-sm flex flex-col justify-between items-center text-center">
+                                            <div class="text-[10px] text-amber-600 font-bold tracking-wider uppercase">APU CAFETERIA</div>
+                                            <div class="text-lg font-extrabold text-slate-900 my-1">${v.value}</div>
+                                            <div class="w-16 h-16 bg-slate-900 rounded-lg p-1 my-1 flex items-center justify-center">
+                                                <i class="fa-solid fa-qrcode text-white text-3xl"></i>
+                                            </div>
+                                            <div class="text-[10px] font-mono text-slate-500 mt-1">${v.code}</div>
+                                            <div class="text-[9px] text-slate-400">Exp: ${v.expiry}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <p class="text-slate-600">Student Affairs will assist your team in rescheduling to any preferred alternative room with full priority.</p>
+                            <p class="text-slate-800 font-bold">Thank you for your understanding.<br>Ahmad Mohammad (Student Affairs)</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            bodyContainer.innerHTML = html;
+        }
+
+        function updateUnreadBadges() {
+            const unreadCount = state.emails.filter(e => e.unread).length;
+            const badge = document.getElementById('unread-badge');
+            const mobileBadge = document.getElementById('mobile-unread-badge');
+            const tag = document.getElementById('inbox-count-tag');
+
+            if (badge) badge.innerText = unreadCount;
+            if (mobileBadge) mobileBadge.innerText = unreadCount;
+            if (tag) tag.innerText = unreadCount;
+        }
+
+        function getFormattedDate() {
+            const now = new Date();
+            const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            return `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]}, ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            let bgClass = 'bg-slate-900 text-white';
+            if (type === 'success') bgClass = 'bg-emerald-600 text-white';
+            if (type === 'error') bgClass = 'bg-red-600 text-white';
+
+            toast.className = `${bgClass} px-4 py-3 rounded-xl shadow-lg text-xs font-semibold flex items-center space-x-2 pointer-events-auto transition-all transform translate-y-2 opacity-0 duration-200`;
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info'}"></i>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
